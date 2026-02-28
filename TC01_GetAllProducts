@@ -1,0 +1,32 @@
+package com.Rest_Assured_project_Testcases;
+
+import org.apache.commons.logging.Log;
+import org.apache.logging.log4j.Logger;
+import org.testng.annotations.Test;
+import com.Rest_Assured_Project.Testcase_log;
+import io.restassured.response.Response;
+import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.lessThan;
+
+public class TC01_GetAllProducts {
+
+	Logger logger = Testcase_log.getLogger(TC01_GetAllProducts.class);
+
+	@Test
+	public void verifyGetAllProducts() {
+
+		logger.info("========== TEST STARTED ==========");
+		Response response = given().when().get("https://fakestoreapi.com/products");
+		int statusCode = response.getStatusCode();
+		String responseBody = response.getBody().asPrettyString();
+		logger.info("Status Code: " + statusCode);
+		logger.info("Response Body: \n" + responseBody);
+		if (statusCode == 200) {
+			logger.info("TEST PASSED");
+		} else {
+			logger.error("TEST FAILED");
+		}
+		response.then().time(lessThan(3000L));
+		logger.info("========== TEST COMPLETED ==========");
+	}
+}
