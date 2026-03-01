@@ -1,0 +1,53 @@
+package com.Rest_Assured_project_Testcases;
+
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import org.apache.logging.log4j.Logger;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import com.Rest_Assured_Project.Testcase_log;
+
+import static io.restassured.RestAssured.given;
+
+public class TC04_Create_Product_Test {
+
+	// Logger Initialization
+	Logger logger = Testcase_log.getLogger(TC04_Create_Product_Test.class);
+
+	@Test
+	public void validateSuccessfulProductCreation() {
+
+		logger.info("************ Starting TC009_CreateProductTest ************");
+
+		RestAssured.baseURI = "https://fakestoreapi.com";
+
+		String requestBody = "{\n" + "  \"title\": \"Automation Test Product\",\n" + "  \"price\": 150.75,\n"
+				+ "  \"description\": \"Created via RestAssured Automation\",\n"
+				+ "  \"image\": \"https://i.pravatar.cc\",\n" + "  \"category\": \"electronics\"\n" + "}";
+
+		logger.info("Sending POST request to create product");
+
+		Response response = given().header("Content-Type", "application/json").body(requestBody).when()
+				.post("/products").then().log().all().extract().response();
+
+		logger.info("Validating Status Code");
+
+		// Status Code Validation
+		Assert.assertEquals(response.getStatusCode(), 201, "Status Code Validation Failed");
+		logger.info("Status Code validated successfully");
+
+		// Validate ID Generated
+		int productId = response.jsonPath().getInt("id");
+		Assert.assertTrue(productId > 0, "Product ID not generated");
+		logger.info("Product ID generated successfully: " + productId);
+
+		// Validate Response Fields
+		Assert.assertEquals(response.jsonPath().getString("title"), "Automation Test Product");
+		Assert.assertEquals(response.jsonPath().getDouble("price"), 150.75);
+
+		logger.info("Response body fields validated successfully");
+
+		logger.info("************ TC009_CreateProductTest Completed ************");
+	}
+}
