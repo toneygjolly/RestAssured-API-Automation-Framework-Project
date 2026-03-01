@@ -1,0 +1,48 @@
+package com.Rest_Assured_project_Testcases;
+
+import org.apache.logging.log4j.Logger;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import com.Rest_Assured_Project.Testcase_log;
+import io.restassured.response.Response;
+
+import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.lessThan;
+import static org.testng.Assert.assertTrue;
+
+public class TC03_Checking_invalid_product_ID {
+	Logger logger = Testcase_log.getLogger(TC02_GetSingleProduct.class);
+
+	@Test
+	public void Checking_invalid_product_ID() {
+
+		logger.info("========== TEST STARTED ==========");
+
+		int productId = 9999;
+
+		Response response = given().when().get("https://fakestoreapi.com/products/" + productId);
+
+		int statusCode = response.getStatusCode();
+		String responseBody = response.getBody().asString();
+
+		logger.info("Status Code: " + statusCode);
+		logger.info("Response Body: " + responseBody);
+
+		if (statusCode != 200) {
+			logger.error("Unexpected Status Code: " + statusCode);
+
+		}
+
+		if (responseBody == null || responseBody.trim().isEmpty()) {
+
+			logger.error("Product ID " + productId + " not found.");
+			Assert.fail("Test Failed: Product ID " + productId + " not found.");
+
+		} else {
+
+			logger.info("Product found successfully.");
+		}
+
+		logger.info("========== TEST COMPLETED ==========");
+	}
+}
