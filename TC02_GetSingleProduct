@@ -1,0 +1,56 @@
+package com.Rest_Assured_project_Testcases;
+
+
+import org.apache.logging.log4j.Logger;
+import org.testng.annotations.Test;
+import com.Rest_Assured_Project.Testcase_log;
+import io.restassured.response.Response;
+
+import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.lessThan;
+
+public class TC02_GetSingleProduct {
+
+    Logger logger = Testcase_log.getLogger(TC02_GetSingleProduct.class);
+
+    @Test
+    public void verifyGetSingleProduct() {
+
+        logger.info("========== TEST STARTED ==========");
+
+        int productId = 1;
+
+        Response response = given()
+                .when()
+                .get("https://fakestoreapi.com/products/" + productId);
+
+        int statusCode = response.getStatusCode();
+        String responseBody = response.getBody().asPrettyString();
+
+        logger.info("Request URL: https://fakestoreapi.com/products/" + productId);
+        logger.info("Status Code: " + statusCode);
+        logger.info("Response Body: \n" + responseBody);
+
+        // Status Code Validation
+        if (statusCode == 200) {
+            logger.info("Status Code Validation PASSED");
+        } else {
+            logger.error("Status Code Validation FAILED");
+        }
+
+        // Response Time Validation
+        response.then().time(lessThan(3000L));
+        logger.info("Response Time Validation PASSED");
+
+        // Field Validation
+        int returnedId = response.jsonPath().getInt("id");
+
+        if (returnedId == productId) {
+            logger.info("Product ID Validation PASSED");
+        } else {
+            logger.error("Product ID Validation FAILED");
+        }
+
+        logger.info("========== TEST COMPLETED ==========");
+    }
+}
